@@ -1,0 +1,46 @@
+# API-only Screenfin relay built from the source-available repository.
+#
+#   docker build -f Dockerfile.relay -t screenfin-relay .
+
+FROM node:22-alpine AS build
+
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
+
+WORKDIR /repo
+
+COPY pnpm-lock.yaml ./
+RUN pnpm fetch
+
+COPY . .
+
+RUN pnpm install --offline --frozen-lockfile --filter @screenfin/relay...
+RUN pnpm --filter @screenfin/relay build
+RUN pnpm --filter @screenfin/relay deploy --legacy --prod /out
+
+FROM node:22-alpine
+
+LABEL org.opencontainers.image.title="Screenfin relay" \
+      org.opencontainers.image.description="The Screenfin watch-party coordination relay" \
+      org.opencontainers.image.source="https://github.com/screenfin/screenfin-server" \
+      org.opencontainers.image.licenses="LicenseRef-PolyForm-Shield-1.0.0"
+
+ENV NODE_ENV=production
+WORKDIR /app
+
+# Root-owned and so read-only to the process; /data is the one directory it writes.
+COPY --from=build /out /app
+COPY --from=build /repo/LICENSE /app/LICENSE
+
+RUN mkdir -p /data && chown node:node /data
+ENV IDENTITY_PATH=/data/relay-identity.json \
+    ROOMS_PATH=/data/rooms.json
+
+USER node
+
+EXPOSE 8484
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -q -O /dev/null "http://127.0.0.1:8484${BASE_PATH}/healthz" || exit 1
+
+CMD ["node", "dist/index.js"]

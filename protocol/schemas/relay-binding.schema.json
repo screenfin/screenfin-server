@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "number",
+      "const": 1
+    },
+    "jellyfinServerId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9-]+$"
+    },
+    "relays": {
+      "minItems": 1,
+      "maxItems": 16,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "relayId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "publicKey": {
+            "type": "string",
+            "pattern": "^B[A-Za-z0-9_-]{86}$"
+          },
+          "urls": {
+            "minItems": 1,
+            "maxItems": 16,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^wss?:\\/\\/[^\\s?#\"\\\\@]+\\/v1\\/ws$"
+                },
+                "priority": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000
+                }
+              },
+              "required": [
+                "url",
+                "priority"
+              ]
+            }
+          }
+        },
+        "required": [
+          "relayId",
+          "publicKey",
+          "urls"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "jellyfinServerId",
+    "relays"
+  ],
+  "$id": "https://screenfin.dev/schemas/v1/relay-binding.json",
+  "title": "Screenfin Sync Protocol v1 — relay binding document (the branding mark, § 2.3)"
+}

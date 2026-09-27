@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "pingIntervalMs": {
+      "type": "integer",
+      "minimum": 250,
+      "maximum": 9007199254740991
+    },
+    "positionReportIntervalMs": {
+      "type": "integer",
+      "minimum": 250,
+      "maximum": 9007199254740991
+    },
+    "driftIgnoreMs": {
+      "type": "number",
+      "minimum": 0
+    },
+    "driftHardMs": {
+      "type": "number",
+      "minimum": 0
+    },
+    "rateCorrection": {
+      "type": "number",
+      "minimum": 0.001,
+      "maximum": 0.5
+    },
+    "ackTimeoutMs": {
+      "type": "integer",
+      "minimum": 100,
+      "maximum": 9007199254740991
+    },
+    "clientTimeoutMs": {
+      "type": "integer",
+      "minimum": 1000,
+      "maximum": 9007199254740991
+    },
+    "reconnectGraceMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "bufferingMaxWaitMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "pingIntervalMs",
+    "positionReportIntervalMs",
+    "driftIgnoreMs",
+    "driftHardMs",
+    "rateCorrection",
+    "ackTimeoutMs",
+    "clientTimeoutMs",
+    "reconnectGraceMs",
+    "bufferingMaxWaitMs"
+  ],
+  "$id": "https://screenfin.dev/schemas/v1/sync-config.json",
+  "title": "Screenfin Sync Protocol v1 — synchronization tuning"
+}

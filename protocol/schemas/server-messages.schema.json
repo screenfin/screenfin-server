@@ -1,0 +1,1531 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "session.welcome"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "replyTo": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "sessionId": {
+              "type": "string",
+              "minLength": 4,
+              "maxLength": 64
+            },
+            "resumeToken": {
+              "type": "string",
+              "minLength": 16,
+              "maxLength": 128
+            },
+            "user": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[^\\u0000-\\u001F\\u007F]+$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64,
+                  "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ]
+            },
+            "serverTime": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "syncConfig": {
+              "type": "object",
+              "properties": {
+                "pingIntervalMs": {
+                  "type": "integer",
+                  "minimum": 250,
+                  "maximum": 9007199254740991
+                },
+                "positionReportIntervalMs": {
+                  "type": "integer",
+                  "minimum": 250,
+                  "maximum": 9007199254740991
+                },
+                "driftIgnoreMs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "driftHardMs": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "rateCorrection": {
+                  "type": "number",
+                  "minimum": 0.001,
+                  "maximum": 0.5
+                },
+                "ackTimeoutMs": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "maximum": 9007199254740991
+                },
+                "clientTimeoutMs": {
+                  "type": "integer",
+                  "minimum": 1000,
+                  "maximum": 9007199254740991
+                },
+                "reconnectGraceMs": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "bufferingMaxWaitMs": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "pingIntervalMs",
+                "positionReportIntervalMs",
+                "driftIgnoreMs",
+                "driftHardMs",
+                "rateCorrection",
+                "ackTimeoutMs",
+                "clientTimeoutMs",
+                "reconnectGraceMs",
+                "bufferingMaxWaitMs"
+              ]
+            },
+            "capabilities": {
+              "default": [],
+              "readOnly": true,
+              "maxItems": 128,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "resumed": {
+              "type": "boolean"
+            },
+            "room": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "roomId": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]{4,64}$"
+                    },
+                    "name": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80,
+                          "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "createdAt": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "startedAt": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "revision": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "hostParticipantId": {
+                      "type": "string",
+                      "minLength": 4,
+                      "maxLength": 64
+                    },
+                    "settings": {
+                      "type": "object",
+                      "properties": {
+                        "controlMode": {
+                          "type": "string",
+                          "enum": [
+                            "host-only",
+                            "everyone"
+                          ]
+                        },
+                        "bufferingPolicy": {
+                          "type": "string",
+                          "enum": [
+                            "pause-all",
+                            "ignore"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "controlMode",
+                        "bufferingPolicy"
+                      ]
+                    },
+                    "playback": {
+                      "type": "object",
+                      "properties": {
+                        "itemId": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 128
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "queue": {
+                          "maxItems": 500,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "itemId": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128
+                              }
+                            },
+                            "required": [
+                              "itemId"
+                            ]
+                          }
+                        },
+                        "queueIndex": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "maturityRating": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "containsUnrated": {
+                          "type": "boolean"
+                        },
+                        "state": {
+                          "type": "string",
+                          "enum": [
+                            "idle",
+                            "playing",
+                            "paused",
+                            "waiting"
+                          ]
+                        },
+                        "positionMs": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "measuredAt": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "rate": {
+                          "type": "number",
+                          "minimum": 0.25,
+                          "maximum": 4
+                        }
+                      },
+                      "required": [
+                        "itemId",
+                        "queue",
+                        "queueIndex",
+                        "maturityRating",
+                        "containsUnrated",
+                        "state",
+                        "positionMs",
+                        "measuredAt",
+                        "rate"
+                      ]
+                    },
+                    "participants": {
+                      "maxItems": 100,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "participantId": {
+                            "type": "string",
+                            "minLength": 4,
+                            "maxLength": 64
+                          },
+                          "userId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "pattern": "^[^\\u0000-\\u001F\\u007F]+$"
+                          },
+                          "userName": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64,
+                            "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                          },
+                          "role": {
+                            "type": "string",
+                            "enum": [
+                              "host",
+                              "guest"
+                            ]
+                          },
+                          "connection": {
+                            "type": "string",
+                            "enum": [
+                              "connected",
+                              "reconnecting"
+                            ]
+                          },
+                          "playerState": {
+                            "type": "string",
+                            "enum": [
+                              "idle",
+                              "loading",
+                              "ready",
+                              "playing",
+                              "paused",
+                              "buffering"
+                            ]
+                          },
+                          "lastPositionMs": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "lastReportAt": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "joinedAt": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "participantId",
+                          "userId",
+                          "userName",
+                          "role",
+                          "connection",
+                          "playerState",
+                          "lastPositionMs",
+                          "lastReportAt",
+                          "joinedAt"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "roomId",
+                    "name",
+                    "createdAt",
+                    "startedAt",
+                    "revision",
+                    "hostParticipantId",
+                    "settings",
+                    "playback",
+                    "participants"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "relay": {
+              "type": "object",
+              "properties": {
+                "relayId": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "jellyfinServerId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 64,
+                      "pattern": "^[A-Za-z0-9-]+$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "relayId",
+                "jellyfinServerId"
+              ]
+            }
+          },
+          "required": [
+            "sessionId",
+            "resumeToken",
+            "user",
+            "serverTime",
+            "syncConfig",
+            "resumed",
+            "room"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "ack"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "replyTo": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "room": {
+              "type": "object",
+              "properties": {
+                "roomId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{4,64}$"
+                },
+                "name": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80,
+                      "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "startedAt": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "hostParticipantId": {
+                  "type": "string",
+                  "minLength": 4,
+                  "maxLength": 64
+                },
+                "settings": {
+                  "type": "object",
+                  "properties": {
+                    "controlMode": {
+                      "type": "string",
+                      "enum": [
+                        "host-only",
+                        "everyone"
+                      ]
+                    },
+                    "bufferingPolicy": {
+                      "type": "string",
+                      "enum": [
+                        "pause-all",
+                        "ignore"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "controlMode",
+                    "bufferingPolicy"
+                  ]
+                },
+                "playback": {
+                  "type": "object",
+                  "properties": {
+                    "itemId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "queue": {
+                      "maxItems": 500,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "itemId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128
+                          }
+                        },
+                        "required": [
+                          "itemId"
+                        ]
+                      }
+                    },
+                    "queueIndex": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maturityRating": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 64,
+                          "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "containsUnrated": {
+                      "type": "boolean"
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "idle",
+                        "playing",
+                        "paused",
+                        "waiting"
+                      ]
+                    },
+                    "positionMs": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "measuredAt": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "rate": {
+                      "type": "number",
+                      "minimum": 0.25,
+                      "maximum": 4
+                    }
+                  },
+                  "required": [
+                    "itemId",
+                    "queue",
+                    "queueIndex",
+                    "maturityRating",
+                    "containsUnrated",
+                    "state",
+                    "positionMs",
+                    "measuredAt",
+                    "rate"
+                  ]
+                },
+                "participants": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "participantId": {
+                        "type": "string",
+                        "minLength": 4,
+                        "maxLength": 64
+                      },
+                      "userId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F]+$"
+                      },
+                      "userName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                      },
+                      "role": {
+                        "type": "string",
+                        "enum": [
+                          "host",
+                          "guest"
+                        ]
+                      },
+                      "connection": {
+                        "type": "string",
+                        "enum": [
+                          "connected",
+                          "reconnecting"
+                        ]
+                      },
+                      "playerState": {
+                        "type": "string",
+                        "enum": [
+                          "idle",
+                          "loading",
+                          "ready",
+                          "playing",
+                          "paused",
+                          "buffering"
+                        ]
+                      },
+                      "lastPositionMs": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "lastReportAt": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "joinedAt": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "participantId",
+                      "userId",
+                      "userName",
+                      "role",
+                      "connection",
+                      "playerState",
+                      "lastPositionMs",
+                      "lastReportAt",
+                      "joinedAt"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "roomId",
+                "name",
+                "createdAt",
+                "startedAt",
+                "revision",
+                "hostParticipantId",
+                "settings",
+                "playback",
+                "participants"
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "replyTo",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "error"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "replyTo": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": [
+                "UNSUPPORTED_PROTOCOL_VERSION",
+                "INVALID_MESSAGE",
+                "NOT_AUTHENTICATED",
+                "AUTH_FAILED",
+                "AUTH_UNAVAILABLE",
+                "AUTH_EXPIRED",
+                "SESSION_RESUME_FAILED",
+                "ALREADY_IN_ROOM",
+                "JOINED_ON_ANOTHER_DEVICE",
+                "NOT_IN_ROOM",
+                "ROOM_NOT_FOUND",
+                "ROOM_FULL",
+                "FORBIDDEN",
+                "VISIBILITY_PENDING",
+                "INVALID_STATE",
+                "RATE_LIMITED",
+                "INTERNAL"
+              ]
+            },
+            "message": {
+              "type": "string"
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "details": {}
+          },
+          "required": [
+            "code",
+            "message",
+            "retryable"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.state"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "replyTo": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "room": {
+              "type": "object",
+              "properties": {
+                "roomId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{4,64}$"
+                },
+                "name": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80,
+                      "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "startedAt": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "hostParticipantId": {
+                  "type": "string",
+                  "minLength": 4,
+                  "maxLength": 64
+                },
+                "settings": {
+                  "type": "object",
+                  "properties": {
+                    "controlMode": {
+                      "type": "string",
+                      "enum": [
+                        "host-only",
+                        "everyone"
+                      ]
+                    },
+                    "bufferingPolicy": {
+                      "type": "string",
+                      "enum": [
+                        "pause-all",
+                        "ignore"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "controlMode",
+                    "bufferingPolicy"
+                  ]
+                },
+                "playback": {
+                  "type": "object",
+                  "properties": {
+                    "itemId": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "queue": {
+                      "maxItems": 500,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "itemId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128
+                          }
+                        },
+                        "required": [
+                          "itemId"
+                        ]
+                      }
+                    },
+                    "queueIndex": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maturityRating": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 64,
+                          "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "containsUnrated": {
+                      "type": "boolean"
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "idle",
+                        "playing",
+                        "paused",
+                        "waiting"
+                      ]
+                    },
+                    "positionMs": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "measuredAt": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "rate": {
+                      "type": "number",
+                      "minimum": 0.25,
+                      "maximum": 4
+                    }
+                  },
+                  "required": [
+                    "itemId",
+                    "queue",
+                    "queueIndex",
+                    "maturityRating",
+                    "containsUnrated",
+                    "state",
+                    "positionMs",
+                    "measuredAt",
+                    "rate"
+                  ]
+                },
+                "participants": {
+                  "maxItems": 100,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "participantId": {
+                        "type": "string",
+                        "minLength": 4,
+                        "maxLength": 64
+                      },
+                      "userId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F]+$"
+                      },
+                      "userName": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                      },
+                      "role": {
+                        "type": "string",
+                        "enum": [
+                          "host",
+                          "guest"
+                        ]
+                      },
+                      "connection": {
+                        "type": "string",
+                        "enum": [
+                          "connected",
+                          "reconnecting"
+                        ]
+                      },
+                      "playerState": {
+                        "type": "string",
+                        "enum": [
+                          "idle",
+                          "loading",
+                          "ready",
+                          "playing",
+                          "paused",
+                          "buffering"
+                        ]
+                      },
+                      "lastPositionMs": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "lastReportAt": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "joinedAt": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "participantId",
+                      "userId",
+                      "userName",
+                      "role",
+                      "connection",
+                      "playerState",
+                      "lastPositionMs",
+                      "lastReportAt",
+                      "joinedAt"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "roomId",
+                "name",
+                "createdAt",
+                "startedAt",
+                "revision",
+                "hostParticipantId",
+                "settings",
+                "playback",
+                "participants"
+              ]
+            },
+            "cause": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "room.created",
+                        "participant.joined",
+                        "participant.left",
+                        "participant.updated",
+                        "host.changed",
+                        "playback.play",
+                        "playback.pause",
+                        "playback.seek",
+                        "playback.setItem",
+                        "queue.set",
+                        "settings.changed",
+                        "buffering.waiting",
+                        "buffering.resumed",
+                        "state.request"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 64
+                    }
+                  ]
+                },
+                "participantId": {
+                  "type": "string",
+                  "minLength": 4,
+                  "maxLength": 64
+                },
+                "reason": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "stalled"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 64
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "type"
+              ]
+            }
+          },
+          "required": [
+            "room",
+            "cause"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.closed"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "replyTo": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "enum": [
+                "host-closed",
+                "empty",
+                "server-shutdown"
+              ]
+            }
+          },
+          "required": [
+            "reason"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.removed"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "replyTo": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "stalled"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                }
+              ]
+            }
+          },
+          "required": [
+            "reason"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "sync.pong"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "replyTo": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "clientTime": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "serverTime": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "clientTime",
+            "serverTime"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "lobby.state"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "replyTo": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "groups": {
+              "maxItems": 200,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "roomId": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_-]{4,64}$"
+                  },
+                  "name": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80,
+                        "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "hostName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64,
+                    "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+                  },
+                  "participantCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "capacity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "itemId": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "roomId",
+                  "name",
+                  "hostName",
+                  "participantCount",
+                  "capacity",
+                  "itemId"
+                ]
+              }
+            }
+          },
+          "required": [
+            "groups"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "sentAt",
+        "payload"
+      ]
+    }
+  ],
+  "$id": "https://screenfin.dev/schemas/v1/server-messages.json",
+  "title": "Screenfin Sync Protocol v1 — server → client messages"
+}

@@ -1,0 +1,16 @@
+.git
+.github
+node_modules
+**/node_modules
+.pnpm-store
+**/dist
+**/coverage
+**/*.log
+**/*.tsbuildinfo
+.env
+.env.*
+!.env.example
+relay/data
+docs
+README.md
+compose.yaml

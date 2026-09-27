@@ -1,0 +1,957 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "session.hello"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "client": {
+              "type": "object",
+              "properties": {
+                "platform": {
+                  "type": "string",
+                  "enum": [
+                    "web",
+                    "ios",
+                    "tvos",
+                    "android",
+                    "androidtv"
+                  ]
+                },
+                "appVersion": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "deviceName": {
+                  "type": "string",
+                  "maxLength": 64
+                }
+              },
+              "required": [
+                "platform",
+                "appVersion"
+              ]
+            },
+            "auth": {
+              "type": "object",
+              "properties": {
+                "jellyfinToken": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "^[\\x20-\\x21\\x23-\\x5B\\x5D-\\x7E]+$"
+                }
+              },
+              "required": [
+                "jellyfinToken"
+              ],
+              "additionalProperties": false
+            },
+            "resume": {
+              "type": "object",
+              "properties": {
+                "sessionId": {
+                  "type": "string",
+                  "minLength": 4,
+                  "maxLength": 64
+                },
+                "resumeToken": {
+                  "type": "string",
+                  "minLength": 16,
+                  "maxLength": 128
+                }
+              },
+              "required": [
+                "sessionId",
+                "resumeToken"
+              ]
+            }
+          },
+          "required": [
+            "client",
+            "auth"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "sync.ping"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "clientTime": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "clientTime"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.create"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+            },
+            "settings": {
+              "type": "object",
+              "properties": {
+                "controlMode": {
+                  "type": "string",
+                  "enum": [
+                    "host-only",
+                    "everyone"
+                  ]
+                },
+                "bufferingPolicy": {
+                  "type": "string",
+                  "enum": [
+                    "pause-all",
+                    "ignore"
+                  ]
+                }
+              }
+            },
+            "item": {
+              "type": "object",
+              "properties": {
+                "itemId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "positionMs": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "itemId"
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.join"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.leave"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.close"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.stateRequest"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string",
+              "enum": [
+                "reconnect",
+                "revision-gap",
+                "manual"
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.setSettings"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "settings": {
+              "type": "object",
+              "properties": {
+                "controlMode": {
+                  "type": "string",
+                  "enum": [
+                    "host-only",
+                    "everyone"
+                  ]
+                },
+                "bufferingPolicy": {
+                  "type": "string",
+                  "enum": [
+                    "pause-all",
+                    "ignore"
+                  ]
+                }
+              }
+            }
+          },
+          "required": [
+            "settings"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "room.transferHost"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "toParticipantId": {
+              "type": "string",
+              "minLength": 4,
+              "maxLength": 64
+            }
+          },
+          "required": [
+            "toParticipantId"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "playback.play"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "positionMs": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "playback.pause"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "positionMs": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "playback.seek"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "positionMs": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "positionMs"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "playback.setItem"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "itemId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "positionMs": {
+              "type": "number",
+              "minimum": 0
+            },
+            "queueIndex": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "itemId"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "queue.set"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "itemId"
+                ]
+              }
+            },
+            "queueIndex": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "items"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "client.position"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "positionMs": {
+              "type": "number",
+              "minimum": 0
+            },
+            "playerState": {
+              "type": "string",
+              "enum": [
+                "idle",
+                "loading",
+                "ready",
+                "playing",
+                "paused",
+                "buffering"
+              ]
+            },
+            "rate": {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 4
+            }
+          },
+          "required": [
+            "positionMs",
+            "playerState"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "client.buffering"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "buffering": {
+              "type": "boolean"
+            },
+            "positionMs": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "buffering"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 64
+        },
+        "type": {
+          "type": "string",
+          "const": "client.ready"
+        },
+        "roomId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{4,64}$"
+        },
+        "sentAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "itemId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          "required": [
+            "itemId"
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "id",
+        "type",
+        "roomId",
+        "sentAt",
+        "payload"
+      ]
+    }
+  ],
+  "$id": "https://screenfin.dev/schemas/v1/client-messages.json",
+  "title": "Screenfin Sync Protocol v1 — client → server messages"
+}

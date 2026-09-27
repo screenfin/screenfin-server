@@ -1,0 +1,36 @@
+name: screenfin
+
+# One container — the relay and the web client.
+
+services:
+  screenfin-server:
+    image: ghcr.io/screenfin/screenfin-server:${SCREENFIN_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      # PORT may carry a bind address: 127.0.0.1:8484 is loopback, for a proxy on
+      # this host. Unset, it is 8484 on every interface, which televisions on a
+      # ws:// LAN address need.
+      - '${PORT:-8484}:8484'
+    environment:
+      JELLYFIN_URL: ${JELLYFIN_URL:?set JELLYFIN_URL in .env}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://${APP_DOMAIN:?set APP_DOMAIN in .env}}
+      ADVERTISED_URLS: ${ADVERTISED_URLS:-wss://${APP_DOMAIN:?set APP_DOMAIN in .env}/v1/ws}
+      # Behind a proxy this must name it, or every client shares one address.
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+      MAX_ROOM_PARTICIPANTS: ${MAX_ROOM_PARTICIPANTS:-16}
+    volumes:
+      # The identity key and the live rooms — back this up.
+      - relay-data:/data
+    # The process writes /data and nothing else, needs no capabilities, and a
+    # runaway is a container restart rather than the host's memory.
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: ${MEM_LIMIT:-512m}
+
+volumes:
+  relay-data:

@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "roomId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{4,64}$"
+    },
+    "name": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "createdAt": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "startedAt": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "hostParticipantId": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 64
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "controlMode": {
+          "type": "string",
+          "enum": [
+            "host-only",
+            "everyone"
+          ]
+        },
+        "bufferingPolicy": {
+          "type": "string",
+          "enum": [
+            "pause-all",
+            "ignore"
+          ]
+        }
+      },
+      "required": [
+        "controlMode",
+        "bufferingPolicy"
+      ]
+    },
+    "playback": {
+      "type": "object",
+      "properties": {
+        "itemId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "queue": {
+          "maxItems": 500,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "itemId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "required": [
+              "itemId"
+            ]
+          }
+        },
+        "queueIndex": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "maturityRating": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "containsUnrated": {
+          "type": "boolean"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "idle",
+            "playing",
+            "paused",
+            "waiting"
+          ]
+        },
+        "positionMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "measuredAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "rate": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 4
+        }
+      },
+      "required": [
+        "itemId",
+        "queue",
+        "queueIndex",
+        "maturityRating",
+        "containsUnrated",
+        "state",
+        "positionMs",
+        "measuredAt",
+        "rate"
+      ]
+    },
+    "participants": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "participantId": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 64
+          },
+          "userId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[^\\u0000-\\u001F\\u007F]+$"
+          },
+          "userName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[^\\u0000-\\u001F\\u007F\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069]+$"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "host",
+              "guest"
+            ]
+          },
+          "connection": {
+            "type": "string",
+            "enum": [
+              "connected",
+              "reconnecting"
+            ]
+          },
+          "playerState": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "loading",
+              "ready",
+              "playing",
+              "paused",
+              "buffering"
+            ]
+          },
+          "lastPositionMs": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lastReportAt": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "joinedAt": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "participantId",
+          "userId",
+          "userName",
+          "role",
+          "connection",
+          "playerState",
+          "lastPositionMs",
+          "lastReportAt",
+          "joinedAt"
+        ]
+      }
+    }
+  },
+  "required": [
+    "roomId",
+    "name",
+    "createdAt",
+    "startedAt",
+    "revision",
+    "hostParticipantId",
+    "settings",
+    "playback",
+    "participants"
+  ],
+  "$id": "https://screenfin.dev/schemas/v1/room-state.json",
+  "title": "Screenfin Sync Protocol v1 — room state"
+}

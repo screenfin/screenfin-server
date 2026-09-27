@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "number",
+      "const": 1
+    },
+    "alg": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32
+    },
+    "nonce": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{22,128}$"
+    },
+    "relayId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "publicKey": {
+      "type": "string",
+      "pattern": "^B[A-Za-z0-9_-]{86}$"
+    },
+    "jellyfinServerId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9-]+$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "urls": {
+      "minItems": 1,
+      "maxItems": 16,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^wss?:\\/\\/[^\\s?#\"\\\\@]+\\/v1\\/ws$"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          }
+        },
+        "required": [
+          "url",
+          "priority"
+        ]
+      }
+    },
+    "capabilities": {
+      "readOnly": true,
+      "maxItems": 128,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      }
+    },
+    "iat": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "exp": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{86}$"
+    }
+  },
+  "required": [
+    "schema",
+    "alg",
+    "nonce",
+    "relayId",
+    "publicKey",
+    "jellyfinServerId",
+    "urls",
+    "capabilities",
+    "iat",
+    "exp",
+    "signature"
+  ],
+  "$id": "https://screenfin.dev/schemas/v1/relay-discovery.json",
+  "title": "Screenfin Sync Protocol v1 — signed relay discovery document (GET /v1/discovery)"
+}
