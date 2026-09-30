@@ -75,6 +75,10 @@ The key lives in the `relay-data` volume, so keep that volume. If it is deleted
 (`docker compose down -v`) or left behind when you move hosts, the relay prints a new mark and
 clients refuse to connect until you paste it in place of the old one.
 
+Some Jellyfin plugins turn on extra features in the Screenfin apps. They are installed on Jellyfin,
+not here; the compatible plugins are listed at
+[screenfin.app/docs#plugins](https://screenfin.app/docs#plugins).
+
 ### Behind a reverse proxy
 
 The proxy must forward WebSocket upgrades on `/v1/ws` and must not close idle connections early; a
