@@ -776,6 +776,17 @@ export class RoomManager {
     if (info.maturityCeiling != null) this.ceilings.set(info.participantId, info.maturityCeiling);
   }
 
+  /**
+   * `forgetSeat` for a seat in `room` — unless its session has since been seated in another room.
+   * A host's held seat outlives its session's membership, and that session may join
+   * elsewhere inside the grace; what it holds there is not this room's to release.
+   */
+  private forgetSeatIn(room: Room, participantId: string): void {
+    const seatedIn = this.memberships.get(participantId);
+    if (seatedIn !== undefined && seatedIn !== room.state.roomId) return;
+    this.forgetSeat(participantId);
+  }
+
   /** Release a session's seat and everything held alongside it. */
   private forgetSeat(participantId: string): void {
     this.memberships.delete(participantId);
@@ -804,6 +815,24 @@ export class RoomManager {
 
   leaveRoom(participantId: string, roomId: string): void {
     const room = this.requireRoomMember(roomId, participantId);
+    // A host who leaves keeps the chair for `reconnectGraceMs`, whatever the reason they left —
+    // Leave, the app closed or relaunched, a handheld backgrounded while paused. The
+    // session is out of the room at once, so it hears nothing more from it and may join another;
+    // the seat stays behind `reconnecting`, exactly as a dropped socket's does, and the same
+    // account taking it back inside the grace takes the chair with it. Unclaimed, the
+    // grace timer removes it and the chair moves by the host-promotion rule. A host alone in the
+    // room idles it as
+    // before, with the chair claim that gives it back to them.
+    const participant = this.getParticipant(room, participantId);
+    if (
+      room.state.hostParticipantId === participantId &&
+      room.state.participants.length > 1 &&
+      participant.connection === 'connected'
+    ) {
+      this.memberships.delete(participantId);
+      this.holdSeat(room, participant);
+      return;
+    }
     this.removeParticipant(room, participantId);
   }
 
@@ -1555,7 +1584,15 @@ export class RoomManager {
     if (!room) return;
     const participant = room.state.participants.find((p) => p.participantId === participantId);
     if (!participant || participant.connection === 'reconnecting') return;
+    this.holdSeat(room, participant);
+  }
 
+  /**
+   * Mark a seat `reconnecting` and arm the grace timer that removes it: a dropped socket, and a
+   * host's deliberate leave.
+   */
+  private holdSeat(room: Room, participant: Participant): void {
+    const participantId = participant.participantId;
     room.deferredHolds.delete(participantId);
     const wasWaitedOn = room.waitingFor.delete(participantId);
     this.clearBufferingTimer(room, participantId);
@@ -2012,7 +2049,7 @@ export class RoomManager {
       this.deps.clearTimer(graceHandle);
       room.graceTimers.delete(participantId);
     }
-    this.forgetSeat(participantId);
+    this.forgetSeatIn(room, participantId);
     const wasWaitedOn = room.waitingFor.delete(participantId);
     if (room.presenceCauseParticipantId === participantId) {
       room.presenceCauseParticipantId = null;
@@ -2204,7 +2241,7 @@ export class RoomManager {
       roomId,
       createServerMessage('room.closed', { reason }, { roomId, sentAt: this.deps.clock() }),
     );
-    for (const p of room.state.participants) this.forgetSeat(p.participantId);
+    for (const p of room.state.participants) this.forgetSeatIn(room, p.participantId);
     this.deps.store.delete(roomId);
     this.deps.persist();
     // The party is gone from the store, so it drops out of the relay lobby.

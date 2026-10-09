@@ -268,6 +268,10 @@ export async function buildServer(deps: BuildServerDeps): Promise<SyncServer> {
     const droppable = isDroppableFrame(message.type);
     for (const participant of room.state.participants) {
       if (participant.participantId === opts?.except) continue;
+      // A `reconnecting` seat has no socket in this room. A dropped one has none at all, but a host
+      // who left keeps theirs — and may already be in another room on it, where this
+      // room's frames would read as that room's.
+      if (participant.connection === 'reconnecting') continue;
       sendRaw(participant.participantId, frame, droppable);
     }
   };
