@@ -35,6 +35,7 @@ import { createFixedWindowLimiter } from './rateLimit';
 import { loadOrCreateRelayIdentity, type RelayIdentity } from './relayIdentity';
 import { RoomManager } from './rooms/manager';
 import { RoomPersistence } from './rooms/persistence';
+import { watchEventLoop } from './eventLoopWatch';
 import { InMemoryRoomStore } from './rooms/store';
 import { MAX_FRAME_BYTES, createRouter } from './router';
 import { SessionRegistry } from './sessions';
@@ -766,14 +767,18 @@ export async function buildServer(deps: BuildServerDeps): Promise<SyncServer> {
   // the logger is idempotent, so a transition after this prints nothing twice.
   logBrandingMark();
 
+  let stopEventLoopWatch: (() => void) | null = null;
   app.addHook('onReady', async () => {
     connections.start();
+    stopEventLoopWatch ??= watchEventLoop(app.log);
     startVisibilityRefresh();
     // Boot never waits on Jellyfin (config.ts); the Id arrives when it arrives.
     void binding.refresh();
     binding.start();
   });
   app.addHook('onClose', async () => {
+    stopEventLoopWatch?.();
+    stopEventLoopWatch = null;
     connections.stop();
     stopLobbyPushes();
     stopVisibilityRefresh();

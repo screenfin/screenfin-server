@@ -1,4 +1,5 @@
 import { chmodSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { chmod, mkdir, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 
 /**
@@ -8,9 +9,15 @@ import { dirname } from 'node:path';
  * tests inject an in-memory implementation so behavior stays deterministic and
  * the suite never touches disk.
  *
- * Deliberately synchronous. Both documents are small, and an asynchronous write
+ * Synchronous by default. Both documents are small, and an asynchronous write
  * would force the message router to become asynchronous for a rare message,
  * while the shutdown flush would race the process exit that follows it.
+ *
+ * **The one exception is the rooms document's trailing save** (`writeAsync`).
+ * Measured: a Proxmox snapshot backup of the relay's VM stretched
+ * disk waits to ~2.4 s, and the synchronous save held the event loop for 46 to
+ * 112 s at a time mid-party — no pong, no healthcheck, every client dropped
+ * together. A save nobody waits on must not be able to stop the relay.
  */
 export interface FileStorage {
   /**
@@ -26,6 +33,17 @@ export interface FileStorage {
    * relay's private key (`IDENTITY_PATH`) asks for `0o600`.
    */
   write: (path: string, contents: string, options?: { mode?: number }) => void;
+  /**
+   * `write` in the background, for a save nobody waits on. Optional: a storage without it is
+   * written synchronously. `commit` is asked just before the atomic rename; `false` abandons this
+   * write, so a newer synchronous write (the shutdown flush) is never overwritten by an older
+   * background one that reaches the disk after it.
+   */
+  writeAsync?: (
+    path: string,
+    contents: string,
+    options?: { mode?: number; commit?: () => boolean },
+  ) => Promise<void>;
 }
 
 export const fsFileStorage: FileStorage = {
@@ -51,5 +69,23 @@ export const fsFileStorage: FileStorage = {
     });
     if (options?.mode !== undefined) chmodSync(tmp, options.mode);
     renameSync(tmp, path);
+  },
+  writeAsync: async (path, contents, options) => {
+    // The same steps as `write`, off the event loop, beside a temporary file of its own so a
+    // synchronous `write` running meanwhile (the shutdown flush) cannot remove it mid-write.
+    await mkdir(dirname(path), { recursive: true });
+    const tmp = `${path}.async.tmp`;
+    await rm(tmp, { force: true });
+    await writeFile(tmp, contents, {
+      encoding: 'utf8',
+      flag: 'wx',
+      ...(options?.mode !== undefined ? { mode: options.mode } : {}),
+    });
+    if (options?.mode !== undefined) await chmod(tmp, options.mode);
+    if (options?.commit !== undefined && !options.commit()) {
+      await rm(tmp, { force: true });
+      return;
+    }
+    await rename(tmp, path);
   },
 };

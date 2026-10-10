@@ -169,6 +169,10 @@ export class RoomPersistence {
   private timer: TimerHandle | null = null;
   /** Suppresses repeat write warnings for one failure streak. */
   private writeFailed = false;
+  /** A background save still on its way to the disk; at most one at a time. */
+  private inFlight: Promise<void> | null = null;
+  /** Bumped by every write, so a background save that lands after a newer one abandons itself. */
+  private generation = 0;
 
   constructor(private readonly deps: RoomPersistenceDeps) {
     this.saveIntervalMs = deps.saveIntervalMs ?? DEFAULT_SAVE_INTERVAL_MS;
@@ -231,8 +235,39 @@ export class RoomPersistence {
     if (this.timer !== null) return;
     this.timer = this.deps.setTimer(() => {
       this.timer = null;
-      this.write();
+      this.save();
     }, this.saveIntervalMs);
+  }
+
+  /**
+   * The trailing save: in the background when the storage can (2026-10-09 — a stalled disk must
+   * delay a save, never the relay), synchronously otherwise. A save still on the disk when the
+   * next window opens leaves this one pending for the window after.
+   */
+  private save(): void {
+    const storage = this.deps.storage;
+    if (storage.writeAsync === undefined) {
+      this.write();
+      return;
+    }
+    if (this.inFlight !== null) {
+      this.markDirty();
+      return;
+    }
+    const contents = this.render();
+    const generation = ++this.generation;
+    this.inFlight = storage
+      .writeAsync(this.deps.path, contents, {
+        mode: ROOMS_FILE_MODE,
+        commit: () => generation === this.generation,
+      })
+      .then(
+        () => this.wrote(),
+        (error: unknown) => this.failed(error),
+      )
+      .finally(() => {
+        this.inFlight = null;
+      });
   }
 
   /**
@@ -258,7 +293,22 @@ export class RoomPersistence {
     }
   }
 
+  /** The synchronous write: the shutdown flush, and the trailing save on a storage with no `writeAsync`. */
   private write(): boolean {
+    const contents = this.render();
+    this.generation += 1;
+    try {
+      this.deps.storage.write(this.deps.path, contents, { mode: ROOMS_FILE_MODE });
+      this.wrote();
+      return true;
+    } catch (error) {
+      this.failed(error);
+      return false;
+    }
+  }
+
+  /** The document as it stands, and the store marked clean. */
+  private render(): string {
     const now = this.deps.clock();
     const all = [...this.deps.store.all()];
     // Live rooms first, then the most recently emptied — the lobby's own order, and the order in
@@ -277,28 +327,25 @@ export class RoomPersistence {
     }
     const rooms = ordered.slice(0, MAX_PERSISTED_ROOMS).map((room) => project(room, now));
     this.dirty = false;
-    try {
-      this.deps.storage.write(
-        this.deps.path,
-        `${JSON.stringify({ version: DOCUMENT_VERSION, savedAt: now, rooms }, null, 2)}\n`,
-        { mode: ROOMS_FILE_MODE },
+    return `${JSON.stringify({ version: DOCUMENT_VERSION, savedAt: now, rooms }, null, 2)}\n`;
+  }
+
+  private wrote(): void {
+    if (this.writeFailed) {
+      this.writeFailed = false;
+      this.deps.logger?.info({ path: this.deps.path }, 'rooms are being persisted again');
+    }
+  }
+
+  private failed(error: unknown): void {
+    // Never fatal: a relay that cannot write its rooms still coordinates
+    // parties perfectly well, it just forgets them on restart.
+    if (!this.writeFailed) {
+      this.writeFailed = true;
+      this.deps.logger?.warn(
+        { path: this.deps.path, err: error },
+        'could not persist rooms; parties will not survive a restart',
       );
-      if (this.writeFailed) {
-        this.writeFailed = false;
-        this.deps.logger?.info({ path: this.deps.path }, 'rooms are being persisted again');
-      }
-      return true;
-    } catch (error) {
-      // Never fatal: a relay that cannot write its rooms still coordinates
-      // parties perfectly well, it just forgets them on restart.
-      if (!this.writeFailed) {
-        this.writeFailed = true;
-        this.deps.logger?.warn(
-          { path: this.deps.path, err: error },
-          'could not persist rooms; parties will not survive a restart',
-        );
-      }
-      return false;
     }
   }
 }
